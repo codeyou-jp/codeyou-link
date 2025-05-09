@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    const redirects = {
+      tamaki: "https://instagram.com/tamaki",
+      yuki: "https://linktr.ee/yuki",
+      riku: "https://codeyou.jp/riku"
+    };
+
+    if (redirects[id]) {
+      window.location.href = redirects[id];
+    } else {
+      window.location.href = "https://codeyou.link/default";
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
