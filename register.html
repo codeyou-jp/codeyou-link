@@ -30,14 +30,25 @@
         return;
       }
 
-      try {
-        await setDoc(doc(db, "redirects", id), {
-          url: url
-        });
-        alert("登録が完了しました！");
-      } catch (error) {
-        alert("登録に失敗しました：" + error);
-      }
+try {
+  await setDoc(doc(db, "redirects", id), {
+    url: url
+  });
+
+  // 成功したときの見た目変更
+  document.body.innerHTML = `
+  <h1>🎉 登録完了！</h1>
+  <p>QRコードを読み取ると、あなたの設定したリンクに飛ぶようになりました。</p>
+  <p><strong>ID:</strong> <code>${id}</code></p>
+  <p><strong>リンク:</strong> <a href="${url}" target="_blank"><code>${url}</code></a></p>
+  <br>
+  <p>もう一度登録したい場合は、ページを再読み込みしてください。</p>
+`;
+} catch (error) {
+  console.error("登録エラー:", error);
+  alert("登録に失敗しました。");
+}
+      
     }
   </script>
 </head>
