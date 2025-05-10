@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CODE:YOU 登録</title>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <h1>CODE:YOU 登録ページ</h1>
+  <p>服に書かれたIDを入力し、あなたのSNSリンクを登録してください</p>
+  
+  <label>ID:</label>
+  <input type="text" id="id" placeholder="例: tamaki7322" />
+  <br /><br />
+  
+  <label>リンク:</label>
+  <input type="text" id="link" placeholder="例: https://instagram.com/xxxx" />
+  <br /><br />
+  
+  <button id="submit-btn">登録する</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
+      authDomain: "codeyou-d.firebaseapp.com",
+      projectId: "codeyou-d",
+      storageBucket: "codeyou-d.appspot.com",
+      messagingSenderId: "734412845111",
+      appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
+      measurementId: "G-2DMVY9S7NM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById("submit-btn").addEventListener("click", async () => {
+      const id = document.getElementById("id").value.trim();
+      const url = document.getElementById("link").value.trim();
+
+      if (!id || !url) {
+        alert("両方の入力欄を埋めてください！");
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "redirects", id), {
+          url: url
+        });
+        alert("登録完了！");
+      } catch (e) {
+        alert("登録に失敗しました：" + e);
+      }
+    });
+  </script>
+</body>
+</html>
