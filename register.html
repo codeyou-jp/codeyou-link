@@ -2,10 +2,27 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CODE:YOU 登録ページ</title>
+</head>
+<body>
+  <h1>CODE:YOU 登録ページ</h1>
+  <p>服のIDとSNSリンクを登録してください。</p>
+  <p style="color: gray; font-size: 0.9em;">
+    ※ IDは自由に決めてOK（例: yourname123）
+  </p>
+
+  <label>ID：</label><br />
+  <input type="text" id="id" placeholder="yourname123" required /><br /><br />
+
+  <label>リンク：</label><br />
+  <input type="url" id="url" placeholder="https://instagram.com/yourpage" required /><br /><br />
+
+  <button id="submit-btn">登録する</button>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
@@ -16,34 +33,34 @@
       appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
       measurementId: "G-2DMVY9S7NM"
     };
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
 
-    if (id) {
-      const docRef = doc(db, "redirects", id);
-      getDoc(docRef).then((docSnap) => {
-        if (docSnap.exists()) {
-          const url = docSnap.data().url;
-          window.location.href = url;
-        } else {
-          // 🔥 未登録IDのときの見た目を改善 ↓↓↓
-          document.body.innerHTML = `
-            <h1>⚠️ IDが未登録です</h1>
-            <p>入力されたID <strong>${id}</strong> は、まだリンクが設定されていません。</p>
-            <p>QRコードを読み込んだだけではアクセスできないようです。</p>
-            <p>持ち主の方が <a href="/register.html">登録ページ</a> で設定する必要があります。</p>
-          `;
-        }
-      }).catch((error) => {
-        console.error("取得エラー:", error);
-        document.body.innerHTML = "<h2>データの取得中にエラーが発生しました。</h2>";
-      });
-    } else {
-      document.body.innerHTML = "<h2>IDが指定されていません。</h2>";
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById("submit-btn").addEventListener("click", async () => {
+      const id = document.getElementById("id").value.trim();
+      const url = document.getElementById("url").value.trim();
+
+      if (!id || !url) {
+        alert("IDとリンクを入力してください！");
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "redirects", id), { url: url });
+        document.body.innerHTML = `
+          <h1>🎉 登録完了！</h1>
+          <p>QRを読み取ると、以下のリンクに飛びます。</p>
+          <p><strong>ID:</strong> <code>${id}</code></p>
+          <p><strong>URL:</strong> <a href="${url}" target="_blank"><code>${url}</code></a></p>
+          <br />
+          <p>再登録したい場合は、このページを更新してください。</p>
+        `;
+      } catch (e) {
+        console.error("登録エラー:", e);
+        alert("登録に失敗しました。もう一度お試しください。");
+      }
+    });
   </script>
-</head>
-<body>
-  <p>Redirecting...</p>
 </body>
 </html>
