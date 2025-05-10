@@ -1,26 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <title>CODE:YOU 登録</title>
-  <meta charset="utf-8" />
-</head>
-<body>
-  <h1>CODE:YOU 登録ページ</h1>
-  <p>服に書かれたIDを入力し、あなたのSNSリンクを登録してください</p>
-  
-  <label>ID:</label>
-  <input type="text" id="id" placeholder="例: codeyou2025" />
-  <br /><br />
-  
-  <label>リンク:</label>
-  <input type="text" id="link" placeholder="例: https://instagram.com/xxxx" />
-  <br /><br />
-  
-  <button id="submit-btn">登録する</button>
-
+  <meta charset="UTF-8">
+  <title>CODE:YOU 登録ページ</title>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // Firebase設定の読み込み
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
@@ -35,24 +21,35 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    document.getElementById("submit-btn").addEventListener("click", async () => {
+    async function registerLink(event) {
+      event.preventDefault();
       const id = document.getElementById("id").value.trim();
-      const url = document.getElementById("link").value.trim();
+      const url = document.getElementById("url").value.trim();
 
-      if (!id || !url) {
-        alert("両方の入力欄を埋めてください！");
-        return;
+      if (id && url) {
+        try {
+          await setDoc(doc(db, "redirects", id), { url: url });
+          alert("登録が完了しました！");
+        } catch (error) {
+          console.error("登録エラー:", error);
+          alert("登録に失敗しました。");
+        }
+      } else {
+        alert("IDとURLの両方を入力してください。");
       }
-
-      try {
-        await setDoc(doc(db, "redirects", id), {
-          url: url
-        });
-        alert("登録完了！");
-      } catch (e) {
-        alert("登録に失敗しました：" + e);
-      }
-    });
+    }
   </script>
+</head>
+<body>
+  <h1>CODE:YOU 登録ページ</h1>
+  <form onsubmit="registerLink(event)">
+    <label for="id">ID（例: codeyou2025）:</label><br>
+    <input type="text" id="id" name="id" required><br><br>
+
+    <label for="url">リンク先URL（例: https://instagram.com/codeyou2025）:</label><br>
+    <input type="url" id="url" name="url" required><br><br>
+
+    <button type="submit">登録する</button>
+  </form>
 </body>
 </html>
