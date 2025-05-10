@@ -2,49 +2,49 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CODE:YOU</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CODE:YOU リダイレクト</title>
 </head>
 <body>
-  <h1>CODE:YOU QRリダイレクト中...</h1>
+  <p>🔄 リダイレクト処理中です…</p>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
-    // Firebase設定
     const firebaseConfig = {
       apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
       authDomain: "codeyou-d.firebaseapp.com",
       projectId: "codeyou-d",
-      storageBucket: "codeyou-d.firebasestorage.app",
+      storageBucket: "codeyou-d.appspot.com",
       messagingSenderId: "734412845111",
       appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
       measurementId: "G-2DMVY9S7NM"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
 
-    // URLパラメータからIDを取得
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
     if (id) {
-      // Firestoreから対応するリンクを取得
-      db.collection("redirects").doc(id).get().then((doc) => {
-        if (doc.exists) {
-          const url = doc.data().url;
-          window.location.href = url;
-        } else {
-          document.body.innerHTML = `<h2>ID「${id}」はまだ登録されていません。</h2>`;
-        }
-      }).catch((error) => {
-        console.error("エラー:", error);
-        document.body.innerHTML = `<h2>データの取得中にエラーが発生しました。</h2>`;
-      });
+      const docRef = doc(db, "redirects", id);
+      getDoc(docRef)
+        .then((docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            window.location.href = data.url;
+          } else {
+            document.body.innerHTML = `<h2>❌ ID「${id}」はまだ登録されていません。</h2>`;
+          }
+        })
+        .catch((error) => {
+          console.error("エラー:", error);
+          document.body.innerHTML = "<h2>⚠️ リンク取得中にエラーが発生しました。</h2>";
+        });
     } else {
-      document.body.innerHTML = `<h2>IDが指定されていません。</h2>`;
+      document.body.innerHTML = "<h2>⚠️ IDが指定されていません。</h2>";
     }
   </script>
 </body>
