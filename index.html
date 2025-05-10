@@ -1,26 +1,51 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Redirecting...</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CODE:YOU</title>
+</head>
+<body>
+  <h1>CODE:YOU QRリダイレクト中...</h1>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <script>
+    // Firebase設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
+      authDomain: "codeyou-d.firebaseapp.com",
+      projectId: "codeyou-d",
+      storageBucket: "codeyou-d.firebasestorage.app",
+      messagingSenderId: "734412845111",
+      appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
+      measurementId: "G-2DMVY9S7NM"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // URLパラメータからIDを取得
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
-    const redirects = {
-      tamaki7322: "https://instagram.com/tamaki7322",
-      yuki: "https://linktr.ee/yuki",
-      riku: "https://codeyou.jp/riku"
-    };
-
-    if (redirects[id]) {
-      window.location.href = redirects[id];
+    if (id) {
+      // Firestoreから対応するリンクを取得
+      db.collection("redirects").doc(id).get().then((doc) => {
+        if (doc.exists) {
+          const url = doc.data().url;
+          window.location.href = url;
+        } else {
+          document.body.innerHTML = `<h2>ID「${id}」はまだ登録されていません。</h2>`;
+        }
+      }).catch((error) => {
+        console.error("エラー:", error);
+        document.body.innerHTML = `<h2>データの取得中にエラーが発生しました。</h2>`;
+      });
     } else {
-      window.location.href = "https://codeyou.link/default";
+      document.body.innerHTML = `<h2>IDが指定されていません。</h2>`;
     }
   </script>
-</head>
-<body>
-  <p>Redirecting...</p>
 </body>
 </html>
