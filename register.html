@@ -4,61 +4,138 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CODE:YOU 登録ページ</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 30px;
+      background: #111;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .logo {
+      font-size: 2em;
+      margin-bottom: 20px;
+      transition: color 0.3s ease;
+    }
+    .logo.hidden {
+      display: none;
+    }
+    .zipper {
+      width: 120px;
+      height: 30px;
+      background: #444;
+      margin: 20px 0;
+      text-align: center;
+      line-height: 30px;
+      cursor: pointer;
+    }
+    .link-box, .id-box {
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      width: 220px;
+    }
+    .qr-button {
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, #ccc, #999);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .color-controls {
+      margin-top: 30px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #0f0;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>CODE:YOU 登録ページ</h1>
-  <p>服のIDとSNSリンクを登録してください。</p>
-  <p style="color: gray; font-size: 0.9em;">
-    ※ IDは自由に決めてOK（例: yourname123）
-  </p>
+  <div class="logo" id="logo">CODE:YOU</div>
 
-  <label>ID：</label><br />
-  <input type="text" id="id" placeholder="yourname123" required /><br /><br />
+  <div class="zipper" id="zipper">チャック開ける</div>
+  <div class="link-box" id="linkBox">
+    <input type="text" id="urlInput" placeholder="あなたのSNSリンク" />
+  </div>
 
-  <label>リンク：</label><br />
-  <input type="url" id="url" placeholder="https://instagram.com/yourpage" required /><br /><br />
+  <div class="qr-button" id="qrButton">QR</div>
+  <div class="id-box" id="idBox">
+    <input type="text" id="idInput" placeholder="あなたのID" />
+  </div>
 
-  <button id="submit-btn">登録する</button>
+  <button id="submitBtn">登録する</button>
+  <div id="message"></div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <div class="color-controls">
+    <label>ロゴ色：</label>
+    <input type="color" id="logoColor" value="#ffffff" />
+    <label>ロゴ表示：</label>
+    <input type="checkbox" id="toggleLogo" checked />
+  </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
       authDomain: "codeyou-d.firebaseapp.com",
       projectId: "codeyou-d",
-      storageBucket: "codeyou-d.appspot.com",
-      messagingSenderId: "734412845111",
-      appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
-      measurementId: "G-2DMVY9S7NM"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // UI操作
+    document.getElementById('zipper').addEventListener('click', () => {
+      document.getElementById('linkBox').style.display = 'flex';
+    });
 
-    document.getElementById("submit-btn").addEventListener("click", async () => {
-      const id = document.getElementById("id").value.trim();
-      const url = document.getElementById("url").value.trim();
+    document.getElementById('qrButton').addEventListener('click', () => {
+      document.getElementById('idBox').style.display = 'flex';
+    });
 
-      if (!id || !url) {
-        alert("IDとリンクを入力してください！");
-        return;
-      }
+    document.getElementById('logoColor').addEventListener('input', (e) => {
+      document.getElementById('logo').style.color = e.target.value;
+    });
 
-      try {
-        await setDoc(doc(db, "redirects", id), { url: url });
-        document.body.innerHTML = `
-          <h1>🎉 登録完了！</h1>
-          <p>QRを読み取ると、以下のリンクに飛びます。</p>
-          <p><strong>ID:</strong> <code>${id}</code></p>
-          <p><strong>URL:</strong> <a href="${url}" target="_blank"><code>${url}</code></a></p>
-          <br />
-          <p>再登録したい場合は、このページを更新してください。</p>
-        `;
-      } catch (e) {
-        console.error("登録エラー:", e);
-        alert("登録に失敗しました。もう一度お試しください。");
+    document.getElementById('toggleLogo').addEventListener('change', (e) => {
+      document.getElementById('logo').classList.toggle('hidden', !e.target.checked);
+    });
+
+    // Firestore登録処理
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const id = document.getElementById('idInput').value.trim();
+      const url = document.getElementById('urlInput').value.trim();
+      const messageEl = document.getElementById('message');
+
+      if (id && url) {
+        db.collection('redirects').doc(id).set({ url: url })
+          .then(() => {
+            messageEl.innerHTML = '✅ 登録完了！あなたのURLはこちら：<br><br>' +
+              `<a href="https://codeyou.link/?id=${id}" target="_blank" style="color:#0ff;">https://codeyou.link/?id=${id}</a>`;
+          })
+          .catch((error) => {
+            messageEl.innerText = '❌ 登録失敗：' + error;
+          });
+      } else {
+        messageEl.innerText = 'IDとリンクを両方入力してください！';
       }
     });
   </script>
