@@ -3,49 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CODE:YOU リダイレクト</title>
+  <title>CODE:YOU | Profile Link</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .logo {
+      font-size: 2em;
+      margin-bottom: 20px;
+      transition: color 0.3s ease;
+    }
+    .logo.hidden {
+      display: none;
+    }
+    .zipper {
+      width: 100px;
+      height: 20px;
+      background: #444;
+      margin: 20px 0;
+      cursor: pointer;
+      position: relative;
+    }
+    .zipper.opened::after {
+      content: '開いた！';
+      position: absolute;
+      top: 30px;
+      color: #fff;
+    }
+    .qr-button {
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, #ccc, #999);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .qr-button:active {
+      transform: scale(1.3);
+      background: red;
+    }
+    .link-box, .id-box {
+      margin-top: 20px;
+      display: none;
+    }
+    .color-controls {
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
-  <p>🔄 リダイレクト処理中です…</p>
+  <div class="logo" id="logo">CODE:YOU</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <div class="zipper" id="zipper">チャック</div>
+  <div class="link-box" id="linkBox">ここにリンクが入ります</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
-      authDomain: "codeyou-d.firebaseapp.com",
-      projectId: "codeyou-d",
-      storageBucket: "codeyou-d.appspot.com",
-      messagingSenderId: "734412845111",
-      appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
-      measurementId: "G-2DMVY9S7NM"
-    };
+  <div class="qr-button" id="qrButton">QR</div>
+  <div class="id-box" id="idBox">ID入力欄（仮）</div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <div class="color-controls">
+    <label for="logoColor">ロゴ色：</label>
+    <input type="color" id="logoColor" value="#ffffff" />
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    <label for="toggleLogo">ロゴ表示：</label>
+    <input type="checkbox" id="toggleLogo" checked />
+  </div>
 
-    if (id) {
-      const docRef = doc(db, "redirects", id);
-      getDoc(docRef)
-        .then((docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            window.location.href = data.url;
-          } else {
-            document.body.innerHTML = `<h2>❌ ID「${id}」はまだ登録されていません。</h2>`;
-          }
-        })
-        .catch((error) => {
-          console.error("エラー:", error);
-          document.body.innerHTML = "<h2>⚠️ リンク取得中にエラーが発生しました。</h2>";
-        });
-    } else {
-      document.body.innerHTML = "<h2>⚠️ IDが指定されていません。</h2>";
-    }
+  <script>
+    document.getElementById('zipper').addEventListener('click', function() {
+      this.classList.toggle('opened');
+      document.getElementById('linkBox').style.display = 'block';
+    });
+
+    document.getElementById('qrButton').addEventListener('click', function() {
+      document.getElementById('idBox').style.display = 'block';
+    });
+
+    document.getElementById('logoColor').addEventListener('input', function(e) {
+      document.getElementById('logo').style.color = e.target.value;
+    });
+
+    document.getElementById('toggleLogo').addEventListener('change', function(e) {
+      document.getElementById('logo').classList.toggle('hidden', !e.target.checked);
+    });
   </script>
 </body>
 </html>
