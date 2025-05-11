@@ -14,6 +14,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s ease;
     }
     .logo {
       font-size: 2em;
@@ -53,9 +54,16 @@
       cursor: pointer;
       margin-top: 20px;
       font-weight: bold;
+      transition: background 0.3s ease;
     }
     .color-controls {
       margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .color-controls label {
+      margin-top: 10px;
     }
     button {
       margin-top: 20px;
@@ -86,8 +94,10 @@
   <div class="color-controls">
     <label>ロゴ色：</label>
     <input type="color" id="logoColor" value="#ffffff" />
-    <label>ロゴ表示：</label>
-    <input type="checkbox" id="toggleLogo" checked />
+    <label>QRボタン色：</label>
+    <input type="color" id="qrColor" value="#cccccc" />
+    <label>背景色：</label>
+    <input type="color" id="bgColor" value="#111111" />
   </div>
 
   <!-- Firebase SDK -->
@@ -115,8 +125,12 @@
       document.getElementById('logo').style.color = e.target.value;
     });
 
-    document.getElementById('toggleLogo').addEventListener('change', (e) => {
-      document.getElementById('logo').classList.toggle('hidden', !e.target.checked);
+    document.getElementById('qrColor').addEventListener('input', (e) => {
+      document.getElementById('qrButton').style.background = e.target.value;
+    });
+
+    document.getElementById('bgColor').addEventListener('input', (e) => {
+      document.body.style.backgroundColor = e.target.value;
     });
 
     // Firestore登録処理
