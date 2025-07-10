@@ -1,102 +1,110 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CODE:YOU | Profile Link</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .logo {
-      font-size: 2em;
-      margin-bottom: 20px;
-      transition: color 0.3s ease;
-    }
-    .logo.hidden {
-      display: none;
-    }
-    .zipper {
-      width: 100px;
-      height: 20px;
-      background: #444;
-      margin: 20px 0;
-      cursor: pointer;
-      position: relative;
-    }
-    .zipper.opened::after {
-      content: '開いた！';
-      position: absolute;
-      top: 30px;
-      color: #fff;
-    }
-    .qr-button {
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, #ccc, #999);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .qr-button:active {
-      transform: scale(1.3);
-      background: red;
-    }
-    .link-box, .id-box {
-      margin-top: 20px;
-      display: none;
-    }
-    .color-controls {
-      margin-top: 30px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CODE:YOU 登録</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <!-- Firebase SDK（v9 compat版） -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
+      authDomain: "codeyou-d.firebaseapp.com",
+      projectId: "codeyou-d",
+      storageBucket: "codeyou-d.firebasestorage.app",
+      messagingSenderId: "734412845111",
+      appId: "1:734412845111:web:82b7cda6543a4def9bcfb2",
+      measurementId: "G-2DMVY9S7NM"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 <body>
-  <div class="logo" id="logo">CODE:YOU</div>
 
-  <div class="zipper" id="zipper">チャック</div>
-  <div class="link-box" id="linkBox">ここにリンクが入ります</div>
+<div class="container">
+  <!-- ロゴ -->
+  <h1 id="logo">CODE:YOU</h1>
 
-  <div class="qr-button" id="qrButton">QR</div>
-  <div class="id-box" id="idBox">ID入力欄（仮）</div>
+  <!-- 右下QRボタン -->
+  <button id="qrBtn" class="qr-btn, icon-btn">
+    <img src="images/qr-code.svg" alt="QRコード" class="qr-icon-img">
+  </button>
 
-  <div class="color-controls">
-    <label for="logoColor">ロゴ色：</label>
-    <input type="color" id="logoColor" value="#ffffff" />
-
-    <label for="toggleLogo">ロゴ表示：</label>
-    <input type="checkbox" id="toggleLogo" checked />
+  <!-- 右下ペイントボタン -->
+  <button id="paintBtn" class="paint-btn icon-btn">
+    <img src="images/codeyou-palette/palette_main.png" alt="ペイント" class="paint-icon" />
+  </button>
+ 
+  <!-- 中央に出現するパレット画像 -->
+  <div id="palettePopup" class="palette-popup hidden">
+    <img id="paletteMain" src="images/codeyou-palette/palette_main.png" alt="ペイントパレット" class="palette-img">
+    <img id="paletteBlank" src="images/codeyou-palette/palette_blank.png" class="palette-img hidden">
   </div>
 
-  <script>
-    document.getElementById('zipper').addEventListener('click', function() {
-      this.classList.toggle('opened');
-      document.getElementById('linkBox').style.display = 'block';
-    });
+  <!--paletteBlankの中に入れるbutton-->
+  <button id="paletteBtn" class="palette-btn hidden">
+    <img id="btnBg" src="images/codeyou-palette/palette-button/button_background.png" alt="背景ボタン" class="button-img">
+    <img id="btnLogo" src="images/codeyou-palette/palette-button/button_logo.png" alt="ロゴボタン" class="button-img">
+    <img id="btnPuzzle" src="images/codeyou-palette/palette-button/button_puzzle.png" alt="パズルボタン" class="button-img">
+    <img id="btnQR" src="images/codeyou-palette/palette-button/button_qr.png" alt="QRボタン" class="button-img">
+  </button>
 
-    document.getElementById('qrButton').addEventListener('click', function() {
-      document.getElementById('idBox').style.display = 'block';
-    });
+  <!-- カラーピッカー（最初は非表示） -->
+  <div id="colorWheelContainer" class="hidden">
+    <div class="hex-input-wrap hidden" id="hexWrap"> 
+      <label for="hexInput">#</label>
+      <input type="text" id="hexInput" maxlength="6" placeholder="ffffff">
+      <button id="applyColorBtn" class="hidden">✅</button>
+    </div>
+  </div>
 
-    document.getElementById('logoColor').addEventListener('input', function(e) {
-      document.getElementById('logo').style.color = e.target.value;
-    });
+  <!-- 4ピース合体画像 -->
+  <img id="swirlComboRegister" src="images/codeyou-puzzle/swirl_combo_register.png" style="display: none; cursor: pointer; position: absolute; bottom: 23%; right: 12.5%; z-index: 9999;" />
+  <img id="puzzleIDLeft" src="images/codeyou-puzzle/puzzle_id_left.png" class="puzzle-img hidden" alt="ピース左下">
+  <img id="puzzleIDRight" src="images/codeyou-puzzle/puzzle_id_right.png" class="puzzle-img hidden" alt="ピース右下">
+  <img id="puzzleLinkLeft" src="images/codeyou-puzzle/puzzle_link_left.png" class="puzzle-img hidden" alt="ピース左上">
+  <img id="puzzleLinkRight" src="images/codeyou-puzzle/puzzle_link_right.png" class="puzzle-img hidden" alt="ピース右上">
 
-    document.getElementById('toggleLogo').addEventListener('change', function(e) {
-      document.getElementById('logo').classList.toggle('hidden', !e.target.checked);
-    });
-  </script>
+
+  <div id="idInputBlock" class="input-block hidden">
+    <img src="images/codeyou-puzzle/id_input_view.png" alt="合体パズル">
+    <input type="text" id="idInput" class="input-field id-input" placeholder="例:codeyou_2025">
+  </div>
+
+  <div id="linkInputBlock" class="input-block hidden">
+    <img src="images/codeyou-puzzle/link_input_view.png" alt="合体パズル">
+    <input type="text" id="linkInput" class="input-field link-input" placeholder="自分のリンク">
+  </div>
+
+  <div id="passInputBlock" class="input-block hidden">
+    <input type="password" id="passInput" class="input-field pass-input" placeholder="パスワード">
+  </div>
+
+  <!--miniswirl達-->
+  <img id="idSwirlMini" src="images/codeyou-puzzle/id_swirl.png" class="puzzle-img hidden" alt="ID入力完了後">
+  <img id="linkSwirlMini" src="images/codeyou-puzzle/link_swirl.png" class="puzzle-img hidden" alt="Link入力完了後">
+  <img id="swirlComboRust" src="images/codeyou-puzzle/swirl_combo_rust.png" class="puzzle-img hidden" alt="重なってるパズル">
+
+  <!-- puzzleCompleteとoverlay（オーバーレイ） -->
+  <div id="overlay" class="hidden"></div>
+  <img id="puzzleComplete" src="images/codeyou-puzzle/puzzle_complete.png" class="puzzle-img hidden" alt="完成パズル">
+</div>
+
+<!-- サウンド素材 -->
+<audio id="sound-pop" src="sounds/pop.mp3"></audio>
+<audio id="sound-maracas-high" src="sounds/maracas_high.mp3"></audio>
+<audio id="sound-maracas-low" src="sounds/maracas_low.mp3"></audio>
+<audio id="sound-switch" src="sounds/switch.mp3"></audio>
+<audio id="sound-fanfare" src="sounds/fanfare.mp3"></audio>
+<audio id="sound-spin" src="sounds/spin.mp3"></audio>
+
+<!-- スクリプト -->
+<script src="script_qr.js"></script>
+<script src="script_paint.js"></script>
+<script src="script_register.js"></script>
 </body>
 </html>
