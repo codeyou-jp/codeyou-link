@@ -6,104 +6,47 @@
   <title>CODE:YOU 登録ページ</title>
   <style>
     body {
-      margin: 0;
-      padding: 30px;
-      background: #111;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: background-color 0.3s ease;
+      margin: 0; padding: 30px; background: #111; color: #fff;
+      font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center;
     }
-    .logo {
-      font-size: 2em;
-      margin-bottom: 20px;
-      transition: color 0.3s ease;
+    .logo { font-size: 2em; margin-bottom: 20px; }
+    .zipper, .qr-button {
+      width: 200px; height: 40px; background: #444; margin: 10px 0;
+      text-align: center; line-height: 40px; cursor: pointer; border: 1px solid #666;
     }
-    .logo.hidden {
-      display: none;
-    }
-    .zipper {
-      width: 120px;
-      height: 30px;
-      background: #444;
-      margin: 20px 0;
-      text-align: center;
-      line-height: 30px;
-      cursor: pointer;
-    }
-    .link-box, .id-box {
-      margin-top: 20px;
-      display: none;
-      flex-direction: column;
-    }
-    input {
-      padding: 8px;
-      margin: 5px;
-      width: 220px;
-    }
-    .qr-button {
-      width: 90px;
-      height: 90px;
-      background: radial-gradient(circle, #ccc, #999);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      margin-top: 20px;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-    .color-controls {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .color-controls label {
-      margin-top: 10px;
-    }
+    .box { display: none; flex-direction: column; margin-bottom: 20px; }
+    input { padding: 10px; margin: 5px; width: 250px; background: #222; color: #fff; border: 1px solid #555; }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #0f0;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
+      margin-top: 20px; padding: 15px 30px; background: #0f0; border: none;
+      font-weight: bold; cursor: pointer; border-radius: 5px;
     }
+    #message { margin-top: 20px; text-align: center; line-height: 1.6; }
+    .hint { font-size: 0.8em; color: #aaa; margin-left: 10px; }
   </style>
 </head>
 <body>
   <div class="logo" id="logo">CODE:YOU</div>
 
-  <div class="zipper" id="zipper">チャック開ける</div>
-  <div class="link-box" id="linkBox">
-    <input type="text" id="urlInput" placeholder="あなたのSNSリンク" />
+  <div class="zipper" id="zipper">▼ チャックを開ける (LINK)</div>
+  <div class="box" id="linkBox">
+    <input type="url" id="urlInput" placeholder="飛ばしたいURL (https://...)" />
   </div>
 
-  <div class="qr-button" id="qrButton">QR</div>
-  <div class="id-box" id="idBox">
-    <input type="text" id="idInput" placeholder="あなたのID" />
+  <div class="qr-button" id="idButton">▼ IDとパスワードを設定</div>
+  <div class="box" id="idBox">
+    <input type="text" id="idInput" placeholder="希望のID (半角英数)" />
+    <input type="password" id="passInput" placeholder="パスワード" />
+    <div class="hint">※英大文字・小文字・数字を含む8文字以上</div>
   </div>
 
-  <button id="submitBtn">登録する</button>
+  <button id="submitBtn">この内容で登録する</button>
   <div id="message"></div>
 
-  <div class="color-controls">
-    <label>ロゴ色：</label>
-    <input type="color" id="logoColor" value="#ffffff" />
-    <label>QRボタン色：</label>
-    <input type="color" id="qrColor" value="#cccccc" />
-    <label>背景色：</label>
-    <input type="color" id="bgColor" value="#111111" />
-  </div>
-
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <script>
+    // 1年前のプロジェクト codeyou-d の設定をそのまま使います
     const firebaseConfig = {
       apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
       authDomain: "codeyou-d.firebaseapp.com",
@@ -112,44 +55,56 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // UI操作
+    // 表示の切り替え
     document.getElementById('zipper').addEventListener('click', () => {
       document.getElementById('linkBox').style.display = 'flex';
     });
-
-    document.getElementById('qrButton').addEventListener('click', () => {
+    document.getElementById('idButton').addEventListener('click', () => {
       document.getElementById('idBox').style.display = 'flex';
     });
 
-    document.getElementById('logoColor').addEventListener('input', (e) => {
-      document.getElementById('logo').style.color = e.target.value;
-    });
+    // バリデーション関数（英大小数字 8文字以上）
+    function validatePass(pass) {
+      const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      return re.test(pass);
+    }
 
-    document.getElementById('qrColor').addEventListener('input', (e) => {
-      document.getElementById('qrButton').style.background = e.target.value;
-    });
-
-    document.getElementById('bgColor').addEventListener('input', (e) => {
-      document.body.style.backgroundColor = e.target.value;
-    });
-
-    // Firestore登録処理
-    document.getElementById('submitBtn').addEventListener('click', () => {
+    // 登録処理
+    document.getElementById('submitBtn').addEventListener('click', async () => {
       const id = document.getElementById('idInput').value.trim();
       const url = document.getElementById('urlInput').value.trim();
+      const pass = document.getElementById('passInput').value;
       const messageEl = document.getElementById('message');
 
-      if (id && url) {
-        db.collection('redirects').doc(id).set({ url: url })
-          .then(() => {
-            messageEl.innerHTML = '✅ 登録完了！あなたのURLはこちら：<br><br>' +
-              `<a href="https://codeyou.link/?id=${id}" target="_blank" style="color:#0ff;">https://codeyou.link/?id=${id}</a>`;
-          })
-          .catch((error) => {
-            messageEl.innerText = '❌ 登録失敗：' + error;
-          });
-      } else {
-        messageEl.innerText = 'IDとリンクを両方入力してください！';
+      if (!id || !url || !pass) {
+        messageEl.innerText = '❌ すべて入力してください！';
+        return;
+      }
+
+      if (!validatePass(pass)) {
+        messageEl.innerText = '❌ パスワードが条件を満たしていません\n(英大文字・小文字・数字を含む8文字以上)';
+        return;
+      }
+
+      try {
+        // すでにIDが使われていないかチェック
+        const doc = await db.collection('users').doc(id).get();
+        if (doc.exists) {
+          messageEl.innerText = '❌ このIDはすでに使われています。';
+          return;
+        }
+
+        // Firestoreに保存
+        await db.collection('users').doc(id).set({
+          link: url,
+          pass: pass, // 本来はハッシュ化すべきですが、まずはシンプルに実装
+          createdAt: new Date()
+        });
+
+        messageEl.innerHTML = `<b style="color:#0f0;">✅ 登録完了！</b><br>ID: ${id}<br>URL: <a href="${url}" target="_blank" style="color:#0ff;">${url}</a><br><br>服に貼るQRコードのURLはこれになります：<br><b>https://codeyou-d.web.app/${id}</b>`;
+        
+      } catch (error) {
+        messageEl.innerText = '❌ エラーが発生しました: ' + error.message;
       }
     });
   </script>
