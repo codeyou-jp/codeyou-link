@@ -1,52 +1,76 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CODE:YOU 登録ページ</title>
-  <style>
-    body {
-      margin: 0; padding: 30px; background: #111; color: #fff;
-      font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center;
-    }
-    .logo { font-size: 2em; margin-bottom: 20px; }
-    .zipper, .qr-button {
-      width: 200px; height: 40px; background: #444; margin: 10px 0;
-      text-align: center; line-height: 40px; cursor: pointer; border: 1px solid #666;
-    }
-    .box { display: none; flex-direction: column; margin-bottom: 20px; }
-    input { padding: 10px; margin: 5px; width: 250px; background: #222; color: #fff; border: 1px solid #555; }
-    button {
-      margin-top: 20px; padding: 15px 30px; background: #0f0; border: none;
-      font-weight: bold; cursor: pointer; border-radius: 5px;
-    }
-    #message { margin-top: 20px; text-align: center; line-height: 1.6; }
-    .hint { font-size: 0.8em; color: #aaa; margin-left: 10px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>CODE:YOU | Register</title>
+    <style>
+        body { background: #000; color: #fff; text-align: center; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; overflow: hidden; }
+        #app { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+
+        /* くるくる回る渦の演出 */
+        #swirl { 
+            width: 180px; 
+            cursor: pointer; 
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+        #swirl:hover { transform: scale(1.05) rotate(10deg); }
+        #swirl.active { transform: scale(0) rotate(720deg); opacity: 0; }
+
+        /* 入力エリア（ふわっと出る） */
+        .hidden { display: none !important; }
+        #inputArea { 
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: all 0.5s ease; 
+        }
+        #inputArea.show { opacity: 1; transform: translateY(0); }
+
+        input {
+            display: block; margin: 15px auto; padding: 12px; width: 250px;
+            background: rgba(255,255,255,0.1); border: 1px solid #444; border-radius: 5px;
+            color: #fff; font-size: 16px; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #0f0; background: rgba(255,255,255,0.2); }
+
+        button {
+            padding: 12px 30px; background: #fff; color: #000; border: none;
+            border-radius: 25px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; margin-top: 10px; letter-spacing: 2px;
+        }
+        button:hover { background: #0f0; transform: translateY(-2px); }
+
+        /* 完成時のパズルアニメーション */
+        #complete { 
+            width: 280px; 
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-  <div class="logo" id="logo">CODE:YOU</div>
 
-  <div class="zipper" id="zipper">▼ チャックを開ける (LINK)</div>
-  <div class="box" id="linkBox">
-    <input type="url" id="urlInput" placeholder="飛ばしたいURL (https://...)" />
-  </div>
+<div id="app">
+    <img id="swirl" src="images/swirl_combo.png" alt="Start">
 
-  <div class="qr-button" id="idButton">▼ IDとパスワードを設定</div>
-  <div class="box" id="idBox">
-    <input type="text" id="idInput" placeholder="希望のID (半角英数)" />
-    <input type="password" id="passInput" placeholder="パスワード" />
-    <div class="hint">※英大文字・小文字・数字を含む8文字以上</div>
-  </div>
+    <div id="inputArea" class="hidden">
+        <h2 style="letter-spacing: 4px;">REGISTRATION</h2>
+        <input id="idInputBlock" placeholder="希望のID">
+        <input id="linkInputBlock" placeholder="飛ばしたいURL (https://...)">
+        <input id="passInputBlock" type="password" placeholder="パスワード(8文字以上)">
+        <button id="registerBtn">CONFIRM</button>
+    </div>
 
-  <button id="submitBtn">この内容で登録する</button>
-  <div id="message"></div>
+    <img id="complete" src="images/puzzle_complete.png" class="hidden" alt="Success">
+</div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <script>
-    // 1年前のプロジェクト codeyou-d の設定をそのまま使います
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyAbprOKaVJO91Wi81oU4mATpnVzMdPUcds",
       authDomain: "codeyou-d.firebaseapp.com",
@@ -55,58 +79,54 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 表示の切り替え
-    document.getElementById('zipper').addEventListener('click', () => {
-      document.getElementById('linkBox').style.display = 'flex';
-    });
-    document.getElementById('idButton').addEventListener('click', () => {
-      document.getElementById('idBox').style.display = 'flex';
-    });
+    const swirl = document.getElementById("swirl");
+    const inputArea = document.getElementById("inputArea");
+    const complete = document.getElementById("complete");
 
-    // バリデーション関数（英大小数字 8文字以上）
-    function validatePass(pass) {
-      const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-      return re.test(pass);
-    }
+    // 渦をクリックして入力欄を出す
+    swirl.addEventListener("click", () => {
+        swirl.classList.add("active");
+        setTimeout(() => {
+            swirl.classList.add("hidden");
+            inputArea.classList.remove("hidden");
+            setTimeout(() => inputArea.classList.add("show"), 50);
+        }, 800);
+    });
 
     // 登録処理
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-      const id = document.getElementById('idInput').value.trim();
-      const url = document.getElementById('urlInput').value.trim();
-      const pass = document.getElementById('passInput').value;
-      const messageEl = document.getElementById('message');
+    document.getElementById("registerBtn").addEventListener("click", async () => {
+        const id = document.getElementById("idInputBlock").value;
+        const link = document.getElementById("linkInputBlock").value;
+        const pass = document.getElementById("passInputBlock").value;
 
-      if (!id || !url || !pass) {
-        messageEl.innerText = '❌ すべて入力してください！';
-        return;
-      }
-
-      if (!validatePass(pass)) {
-        messageEl.innerText = '❌ パスワードが条件を満たしていません\n(英大文字・小文字・数字を含む8文字以上)';
-        return;
-      }
-
-      try {
-        // すでにIDが使われていないかチェック
-        const doc = await db.collection('users').doc(id).get();
-        if (doc.exists) {
-          messageEl.innerText = '❌ このIDはすでに使われています。';
-          return;
+        if (id.length < 3 || pass.length < 8) {
+            alert("IDは3文字以上、パスワードは8文字以上で入力してください");
+            return;
         }
 
-        // Firestoreに保存
-        await db.collection('users').doc(id).set({
-          link: url,
-          pass: pass, // 本来はハッシュ化すべきですが、まずはシンプルに実装
-          createdAt: new Date()
-        });
+        try {
+            // 重複チェック
+            const docRef = db.collection('users').doc(id);
+            const docSnap = await docRef.get();
+            if (docSnap.exists) {
+                alert("このIDは既に使用されています");
+                return;
+            }
 
-        messageEl.innerHTML = `<b style="color:#0f0;">✅ 登録完了！</b><br>ID: ${id}<br>URL: <a href="${url}" target="_blank" style="color:#0ff;">${url}</a><br><br>服に貼るQRコードのURLはこれになります：<br><b>https://codeyou-d.web.app/${id}</b>`;
-        
-      } catch (error) {
-        messageEl.innerText = '❌ エラーが発生しました: ' + error.message;
-      }
+            await docRef.set({ link, pass });
+
+            // 演出：入力欄が消えてパズルが完成！
+            inputArea.classList.remove("show");
+            setTimeout(() => {
+                inputArea.classList.add("hidden");
+                complete.classList.remove("hidden");
+            }, 500);
+
+        } catch (e) {
+            alert("エラーが発生しました");
+            console.error(e);
+        }
     });
-  </script>
+</script>
 </body>
 </html>
