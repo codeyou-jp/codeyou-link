@@ -1,0 +1,140 @@
+/* スマホ用アスペクト比固定のベース */
+:root {
+    --bg-reg: #ffffff;
+    --text-reg: #333333;
+    --bg-edit: #1a1a1a;
+    --text-edit: #ffffff;
+    --accent: #565656;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    transition: all 0.5s ease;
+}
+
+/* 登録ページ（白） */
+body.register-mode {
+    background-color: var(--bg-reg);
+    color: var(--text-reg);
+}
+
+/* 編集ページ（黒） */
+body.edit-mode {
+    background-color: var(--bg-edit);
+    color: var(--text-edit);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 0 40px;
+    box-sizing: border-box;
+}
+
+.logo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin-bottom: 50px;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+
+
+input {
+    width: 100%;
+    border: none !important;
+    outline: none !important;
+    padding: 10px 0;
+    font-size: 1rem;
+    background: transparent;
+    color: inherit;
+}
+
+.edit-mode input {
+    border-color: #444;
+}
+
+input:focus {
+    border-color: var(--accent);
+}
+
+.btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-submit {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* モード切替用（開発中の確認用ボタン） */
+.mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: #eee;
+    color: #333;
+    cursor: pointer;
+}
+
+fieldset {
+    border: 2px solid #ddd !important;
+    border-radius: 10px;
+    padding: 0 15px;
+    margin-bottom: 5px;
+    transition: all 0.2s;
+}
+
+fieldset.error-border {
+    border-color: #d93025 !important;
+}
+
+fieldset.error-border legend {
+    color: #d93025;
+}
+
+.error-text {
+    color: #d93025;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin: 5px 0 15px 5px; /* 枠の下に配置 */
+    text-align: left;
+}
+
+fieldset:focus-within {
+    border: 1px solid #333 !important; /* 少し濃いグレーに */
+}
+
+fieldset.error-border:focus-within {
+    border: 1px solid #333 !important;
+}
+
+input:focus {
+    outline: none;
+}
+
+.hidden {
+    display: none !important;
+}
