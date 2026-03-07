@@ -166,12 +166,13 @@ input:focus::placeholder {
 
 .error-text {
     color: var(--error-color);
-    font-size: 1rem;
+    font-size: 0.7rem;
     font-weight: bold;
     /* 枠のすぐ下に左寄せで表示 */
     margin: 5px 0 15px 5px; 
     text-align: left;
     display: block;
+    white-space: nowrap;
 }
 
 .hidden {
