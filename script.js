@@ -157,6 +157,18 @@ function resetPassError() {
     passError.classList.add('hidden');
 }
 
+
+function showError(f, e, m) {
+    f.classList.add('error-border');
+    e.textContent = m;
+    e.classList.remove('hidden');
+}
+
+function hideError(f, e) {
+    f.classList.remove('error-border');
+    e.classList.add('hidden');
+}
+
 function handleSubmit() {
     // 最終チェック：エラーがあるか、空欄があるか
     const hasError = document.querySelector('.error-border');
