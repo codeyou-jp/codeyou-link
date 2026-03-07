@@ -195,3 +195,11 @@ togglePass.addEventListener('click', function() {
         this.closest('fieldset').classList.remove('error-border');
     });
 });
+
+// 各入力欄のフォーカス設定
+[idInput, linkInput, passInput].forEach(input => {
+    input.addEventListener('focus', function() {
+        const box = this.closest('.custom-box');
+        if (box) box.classList.remove('error-border');
+    });
+});
