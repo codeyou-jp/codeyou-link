@@ -18,24 +18,25 @@
         <div id="idFieldset" class="custom-box">
             <input type="text" id="idInput" placeholder="ID">
         </div>
-        <div id="idError" class="error-text hidden"></div>
+        <div id="idError" class="error-text hidden">IDを入力してください</div>
     </div>
 
     <div class="form-group">
         <div id="linkFieldset" class="custom-box">
             <input type="text" id="linkInput" placeholder="Link">
         </div>
-        <div id="linkError" class="error-text hidden"></div>
+        <div id="linkError" class="error-text hidden">リンクを入力してください</div>
     </div>
 
-<div class="form-group">
-    <div id="passFieldset" class="custom-box">
-        <div class="input-wrapper-left">
-            <span id="togglePass" class="material-symbols-outlined eye-icon-left">visibility_off</span>
-            <input type="password" id="passInput" placeholder="Password">
+    <div class="form-group">
+        <div id="passFieldset" class="custom-box">
+            <div class="input-wrapper-right">
+                <input type="password" id="passInput" placeholder="Password">
+                <span id="togglePass" class="material-symbols-outlined eye-icon">visibility_off</span>
+            </div>
         </div>
-    </div> <div id="passError" class="error-text hidden">英字、数字を含め８字以上で指定してください</div>
-</div>
+        <div id="passError" class="error-text hidden">英字、数字を含め８字以上で指定してください</div>
+    </div>
 
     <button class="btn btn-submit" onclick="handleSubmit()">ENTER</button>
 </div>
