@@ -109,23 +109,29 @@ input:focus::placeholder {
     opacity: 0;
 }
 
+
+
 /* =========================================
    4. パスワードアイコンの設定
    ========================================= */
-.input-wrapper-left {
+.input-wrapper-right {
     position: relative;
     display: flex;
     align-items: center;
     width: 100%;
 }
 
-.eye-icon-left {
+.input-wrapper-right input {
+    flex: 1;
+    padding-right: 40px !important; /* アイコンと重ならない余白 */
+}
+
+.eye-icon {
     position: absolute;
-    left: 0;
+    right: 0;
     cursor: pointer;
     color: #5f6368;
-    font-size: 20px;
-    z-index: 10;
+    font-size: 24px; /* スマホで押しやすいサイズ */
     user-select: none;
 }
 
@@ -216,4 +222,8 @@ input:focus::placeholder {
 .custom-box + .error-text {
     position: relative;
     z-index: 1;
+}
+
+.custom-box.error-border {
+    border-color: #d93025 !important;
 }
