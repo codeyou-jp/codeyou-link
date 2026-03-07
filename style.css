@@ -98,7 +98,7 @@ input {
 #idInput, 
 #linkInput, 
 #passInput {
-    padding-left: 35px !important;
+    padding-left: 0px !important;
 }
 
 input::placeholder {
