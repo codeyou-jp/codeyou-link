@@ -84,11 +84,11 @@ fieldset.error-border:focus-within {
 input {
     width: 100%;
     flex: 1;
-    padding: 15px 0;
+    padding: 20px 0;
     padding-left: 0 !important;
     border: none !important;
     outline: none !important;
-    font-size: 1rem;
+    font-size: 1.3rem;
     background: transparent;
     color: inherit;
     box-sizing: border-box;
@@ -227,4 +227,53 @@ input:focus::placeholder {
 
 .custom-box.error-border {
     border-color: #d93025 !important;
+}
+
+
+
+/* 親要素を基準にする */
+.custom-box.floating-label {
+    position: relative;
+    padding: 0 15px !important;
+    display: flex;
+    align-items: center;
+}
+
+.floating-label {
+    position: relative;
+    padding-top: 10px !important; /* ラベルが上に浮くスペースを作る */
+}
+
+/* ラベルの初期位置（入力欄の真ん中） */
+.floating-label label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 1.2rem; /* 初期状態も少し大きく */
+    transition: all 0.2s ease;
+    pointer-events: none;
+    background-color: transparent; /* 最初は背景透明 */
+    padding: 0 5px;
+}
+/* パスワードだけアイコン分ズラしていた場合はここも調整 */
+/* 今回は左端からにするなら不要ですが、もしズレるなら left を調整してください */
+
+/* ★浮き上がる条件：フォーカスされた時、または文字が入っている時 */
+.floating-label input:focus + label,
+.floating-label input:not(:placeholder-shown) + label {
+    top: 0; /* 枠線の真上に配置 */
+    left: 10px;
+    font-size: 0.9rem; /* ラベルのサイズ */
+    color: var(--accent);
+    font-weight: bold;
+    background-color: white; /* ★重要：枠線を消すために背景を白にする（bodyの色に合わせる） */
+    transform: translateY(-50%); /* 枠線のちょうど真ん中に重ねる */
+}
+
+/* 入力欄自体のパディング（文字がラベルと重ならないように下げる） */
+.floating-label input {
+    padding-top: 20px !important;
+    padding-bottom: 10px !important;
 }
