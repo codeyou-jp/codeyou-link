@@ -129,7 +129,7 @@ input:focus::placeholder {
 
 .eye-icon {
     position: absolute;
-    padding-right: 50px !importan;
+    right: 0;
     cursor: pointer;
     color: #5f6368;
     font-size: 24px; /* スマホで押しやすいサイズ */
@@ -166,7 +166,7 @@ input:focus::placeholder {
 
 .error-text {
     color: var(--error-color);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
     /* 枠のすぐ下に左寄せで表示 */
     margin: 5px 0 15px 5px; 
@@ -277,7 +277,3 @@ input:focus::placeholder {
     padding-top: 20px !important;
     padding-bottom: 10px !important;
 }
-
-
-
-
