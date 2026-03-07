@@ -1,10 +1,13 @@
-/* スマホ用アスペクト比固定のベース */
+/* =========================================
+   1. 変数と基本設定
+   ========================================= */
 :root {
     --bg-reg: #ffffff;
     --text-reg: #333333;
     --bg-edit: #1a1a1a;
     --text-edit: #ffffff;
     --accent: #565656;
+    --error-color: #d93025;
 }
 
 body, html {
@@ -15,13 +18,11 @@ body, html {
     transition: all 0.5s ease;
 }
 
-/* 登録ページ（白） */
 body.register-mode {
     background-color: var(--bg-reg);
     color: var(--text-reg);
 }
 
-/* 編集ページ（黒） */
 body.edit-mode {
     background-color: var(--bg-edit);
     color: var(--text-edit);
@@ -44,31 +45,97 @@ body.edit-mode {
     margin-bottom: 50px;
 }
 
+/* =========================================
+   2. 枠線 (fieldset) の設定
+   ========================================= */
 .form-group {
     width: 100%;
     margin-bottom: 20px;
 }
 
+fieldset {
+    border: 4px solid #ddd !important;
+    border-style: solid !important;
+    border-radius: 10px;
+    padding: 0 15px;
+    margin-bottom: 5px;
+    transition: border-color 0.2s;
+    background: transparent;
+}
 
+/* 入力中の枠色 (#565656) */
+fieldset:focus-within {
+    border-color: var(--accent) !important;
+}
 
+/* エラー時の枠色 (赤) */
+fieldset.error-border {
+    border-color: var(--error-color) !important;
+}
+
+/* エラー中でも入力中はグレーを優先 */
+fieldset.error-border:focus-within {
+    border-color: var(--accent) !important;
+}
+
+/* =========================================
+   3. 入力欄 (input) の設定
+   ========================================= */
 input {
     width: 100%;
+    flex: 1;
+    padding: 15px 0;
     border: none !important;
     outline: none !important;
-    padding: 10px 0;
     font-size: 1rem;
     background: transparent;
     color: inherit;
+    box-sizing: border-box;
 }
 
-.edit-mode input {
-    border-color: #444;
+/* 文字の開始位置をアイコン分(35px)ズラして統一 */
+#idInput, 
+#linkInput, 
+#passInput {
+    padding-left: 35px !important;
 }
 
-input:focus {
-    border-color: var(--accent);
+input::placeholder {
+    color: #aaa;
+    transition: opacity 0.2s;
 }
 
+input:focus::placeholder {
+    opacity: 0;
+}
+
+/* =========================================
+   4. パスワードアイコンの設定
+   ========================================= */
+.input-wrapper-left {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.eye-icon-left {
+    position: absolute;
+    left: 0;
+    cursor: pointer;
+    color: #5f6368;
+    font-size: 20px;
+    z-index: 10;
+    user-select: none;
+}
+
+.eye-icon-left:hover {
+    color: #333;
+}
+
+/* =========================================
+   5. ボタンとエラーメッセージ
+   ========================================= */
 .btn {
     width: 100%;
     padding: 15px;
@@ -86,7 +153,25 @@ input:focus {
     color: white;
 }
 
-/* モード切替用（開発中の確認用ボタン） */
+.btn:active {
+    transform: scale(0.98); /* 押した時に少し凹む */
+}
+
+.error-text {
+    color: var(--error-color);
+    font-size: 1rem;
+    font-weight: bold;
+    /* 枠のすぐ下に左寄せで表示 */
+    margin: 5px 0 15px 5px; 
+    text-align: left;
+    display: block;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* モード切替ボタン */
 .mode-toggle {
     position: fixed;
     top: 20px;
@@ -97,44 +182,38 @@ input:focus {
     background: #eee;
     color: #333;
     cursor: pointer;
+    z-index: 100;
 }
 
-fieldset {
-    border: 2px solid #ddd !important;
+/* 枠線の設定 (divに適用) */
+.custom-box {
+    border: 2px solid #ddd !important; /* ここでしっかり枠線を描く */
     border-radius: 10px;
     padding: 0 15px;
     margin-bottom: 5px;
-    transition: all 0.2s;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    transition: border-color 0.2s;
+    box-sizing: border-box; /* 枠の太さを内側に含める */
 }
 
-fieldset.error-border {
-    border-color: #d93025 !important;
+/* 入力中の色 (濃いグレー) */
+.custom-box:focus-within {
+    border-color: var(--accent) !important;
 }
 
-fieldset.error-border legend {
-    color: #d93025;
+/* エラー時の色 (赤) */
+.custom-box.error-border {
+    border-color: var(--error-color) !important;
 }
 
-.error-text {
-    color: #d93025;
-    font-size: 0.75rem;
-    font-weight: bold;
-    margin: 5px 0 15px 5px; /* 枠の下に配置 */
-    text-align: left;
+/* エラー中でも入力中はグレーを優先 */
+.custom-box.error-border:focus-within {
+    border-color: var(--accent) !important;
 }
 
-fieldset:focus-within {
-    border: 1px solid #333 !important; /* 少し濃いグレーに */
-}
-
-fieldset.error-border:focus-within {
-    border: 1px solid #333 !important;
-}
-
-input:focus {
-    outline: none;
-}
-
-.hidden {
-    display: none !important;
+.custom-box + .error-text {
+    position: relative;
+    z-index: 1;
 }
