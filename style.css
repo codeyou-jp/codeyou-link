@@ -166,7 +166,7 @@ input:focus::placeholder {
 
 .error-text {
     color: var(--error-color);
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: bold;
     /* 枠のすぐ下に左寄せで表示 */
     margin: 5px 0 15px 5px; 
@@ -277,6 +277,7 @@ input:focus::placeholder {
     padding-top: 20px !important;
     padding-bottom: 10px !important;
 }
+
 
 
 
