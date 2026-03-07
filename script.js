@@ -16,6 +16,7 @@ const linkError = document.getElementById('linkError');
 const passInput = document.getElementById('passInput');
 const passFieldset = document.getElementById('passFieldset');
 const passError = document.getElementById('passError');
+const togglePass = document.getElementById('togglePass');
 
 function handleSubmit() {
     const id = document.getElementById('idInput').value;
@@ -114,33 +115,46 @@ function resetLinkError() {
     linkError.classList.add('hidden');
 }
 
+// --- Password入力欄から離れた（Blur）時の判定 ---
 passInput.addEventListener('blur', function() {
     const val = passInput.value;
-    // 英字と数字を両方含むかチェックする魔法の言葉
-    const hasAlphaNum = /(?=.*[a-zA-Z])(?=.*\d)/.test(val);
+    
+    // 1. 英字が含まれているかチェック
+    const hasAlpha = /[a-zA-Z]/.test(val);
+    // 2. 数字が含まれているかチェック
+    const hasNum = /\d/.test(val);
+    // 3. 8文字以上かチェック
+    const isLongEnough = val.length >= 8;
 
-    if (val.length < 8 || !hasAlphaNum) {
-        passFieldset.classList.add('error-border');
-        // メッセージはHTMLの要素に合わせて書き換えてね
+    if (val === "") {
+        // 空っぽの時
+        showPassError("パスワードを入力してください");
+    } else if (!isLongEnough || !hasAlpha || !hasNum) {
+        // 8文字未満、または英字か数字が足りない時
+        showPassError("英字、数字を含め８字以上で指定してください");
     } else {
-        passFieldset.classList.remove('error-border');
+        // 合格！
+        resetPassError();
     }
 });
 
-// パスワード表示切替の機能
-document.getElementById('showPass').addEventListener('change', function() {
-    passInput.type = this.checked ? 'text' : 'password';
+// 入力を始めたら赤枠を消してあげる（フォーカス時）
+passInput.addEventListener('focus', function() {
+    passFieldset.classList.remove('error-border');
+    // メッセージも隠したい場合はここに追加
+    passError.classList.add('hidden');
 });
 
-function showError(f, e, m) {
-    f.classList.add('error-border');
-    e.textContent = m;
-    e.classList.remove('hidden');
+// --- Password専用のエラー表示・リセット関数 ---
+function showPassError(message) {
+    passFieldset.classList.add('error-border');
+    passError.textContent = message;
+    passError.classList.remove('hidden');
 }
 
-function hideError(f, e) {
-    f.classList.remove('error-border');
-    e.classList.add('hidden');
+function resetPassError() {
+    passFieldset.classList.remove('error-border');
+    passError.classList.add('hidden');
 }
 
 function handleSubmit() {
@@ -152,3 +166,20 @@ function handleSubmit() {
         alert("入力内容を確認してください");
     }
 }
+
+togglePass.addEventListener('click', function() {
+    // type属性を切り替える
+    const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passInput.setAttribute('type', type);
+    
+    // アイコンの文字（見た目）を切り替える
+    // visibility = 開いた目 / visibility_off = 斜線入りの目
+    this.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+});
+
+// 各入力欄のフォーカス設定
+[idInput, linkInput, passInput].forEach(input => {
+    input.addEventListener('focus', function() {
+        this.closest('fieldset').classList.remove('error-border');
+    });
+});
